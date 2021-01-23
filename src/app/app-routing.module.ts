@@ -3,12 +3,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { AuthGuardGuard } from './auth-guard.guard';
 
 
 const routes: Routes = [
   {
     path: 'home', 
     component: HomeComponent,
+    canActivate:[AuthGuardGuard]
   },
   {
     path:'',

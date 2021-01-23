@@ -34,9 +34,10 @@ export class SignInComponent implements OnInit {
     if(val.username && val.password){
       this.authService.signIn(val.username , val.password).subscribe(res=>{
         console.log(res);
-        localStorage.setItem('bearer', res)
+        localStorage.setItem('token', res)
         this.route.navigate(['/home']);
-      })
+      },
+      err => console.log(err))
     }
     
   }

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { baseUrl } from './../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -16,11 +17,24 @@ export class AuthServiceService {
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private loggedUser: string;
 
-  constructor(private http:HttpClient) { }
+  constructor(private http:HttpClient, private router:Router) { }
 
   
   signIn(username:string, password:string):Observable<any>{
     return this.http.post<any>(`${baseUrl}account/login`, { username,password});
+  }
+
+  logoutUser() {
+    localStorage.removeItem('token')
+    this.router.navigate(['/sign-in'])
+  }
+
+  getToken() {
+    return localStorage.getItem('token')
+  }
+
+  loggedIn() {
+    return !!localStorage.getItem('token')    
   }
 
 }

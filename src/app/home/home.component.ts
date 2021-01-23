@@ -1,8 +1,10 @@
+import { Router } from '@angular/router';
+import { UserDataService } from './../user-data.service';
 import { baseUrl } from './../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Chart } from "node_modules/chart.js";
-import { data } from 'jquery';
+import { AuthServiceService } from '../auth-service.service';
 
 @Component({
   selector: 'app-home',
@@ -11,91 +13,126 @@ import { data } from 'jquery';
 })
 export class HomeComponent implements OnInit {
 
- 
+ chartDonut = [];
+ nameDonut = [];
+ chartBar = [];
+ tableUsers:any;
+ data = [];
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private userData: UserDataService, 
+    private route: Router, public authService: AuthServiceService) {
 
-    var t=`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGFlbWVuZXJzb2wuY29tIiwianRpIjoiYjVkNGIwNzItYWNkMy00ZjEyLWE5MGItMzQ4Yjk0MjM3NjRmIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzMzE4ZTcxMC05MzAzLTQ4ZmQtODNjNS1mYmNhOTU0MTExZWYiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNjEzODM1NDA2LCJpc3MiOiJodHRwOi8vdGVzdGRlbW8uYWVtLWVuZXJzb2wuY29tIiwiYXVkIjoiaHR0cDovL3Rlc3RkZW1vLmFlbS1lbmVyc29sLmNvbSJ9.mAqufPF17rp5AxWlyXQJEYqPhwV0v2fDjwqTJTEZ8Z0`;
-    var headers_object = new HttpHeaders().set("Authorization", "Bearer " + t);
-
-    this.http.get(`${baseUrl}api/dashboard`, ).toPromise().then(data =>{
-      console.log(data);
-    })
 
    }
 
-  ngOnInit() {
-    var pieChart = new Chart("pieChart", {
-      type: 'doughnut',
-      data: {
-        labels: ['Donut 1', 'Donut 2', 'Donut 3', 'Donut 4'],
-        datasets: [{
-          label: '# of Votes',
-          data: [25.0, 22.0, 29.0, 8.0],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)'
-            
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)'
-            
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        }
-      }
-    });
 
-    var barChart = new Chart("barChart", {
-      type: 'bar',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [{
-          label: '# of Votes',
-          data: [12, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
+
+  ngOnInit() {
+
+
+    this.userData.getData()
+    .subscribe(res => {
+      this.tableUsers = res.tableUsers;
+
+      this.chartDonut = res.chartDonut;
+      var labelsDonut =  this.chartDonut.map(function(e) {
+        return e.name;
+     });
+     var dataDonut =  this.chartDonut.map(function(e) {
+        return e.value;
+     });;
+
+      var pieChart = new Chart("pieChart", {
+        type: 'doughnut',
+        data: {
+          labels: labelsDonut,
+          datasets: [{
+            label: '# of Votes',
+            data: dataDonut,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)'
+              
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)'
+              
+            ],
+            borderWidth: 1
           }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      });
+  
+
+      this.chartBar = res.chartBar;
+      console.log(this.chartBar);
+      var labelsBar =  this.chartBar.map(function(e) {
+        return e.name;
+     });
+     var dataBar =  this.chartBar.map(function(e) {
+        return e.value;
+     });;
+
+      var barChart = new Chart("barChart", {
+        type: 'bar',
+        data: {
+          labels: labelsBar,
+          datasets: [{
+            label: '# of Votes',
+            data: dataBar,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      });
+
+    },
+      err => {
+        if( err instanceof HttpErrorResponse ) {
+          if (err.status === 401) {
+            this.route.navigate(['/login'])
+          }
         }
       }
-    });
+    )
   }
 
 }
